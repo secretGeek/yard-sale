@@ -1,0 +1,28 @@
+﻿body {
+  max-width: 90ch;
+  padding: 2ch;
+  margin: auto;
+  color: #eee;
+  background: #333;
+  font-size: 1.2em;
+  outline: 1px solid black;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+}
+pre {
+  white-space: pre-wrap;
+}
+.person {
+    border:1px solid black;
+    max-width:120px;
+    display:inline-block;
+    font-size:8pt;
+}
+.person p { padding:0}
+.person[data-money]::after {
+   background-color:blue;
+   display:inline-block;
+   content:attr(data-money);
+}
+progress {
+    max-width:120px;
+}

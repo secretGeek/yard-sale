@@ -1,0 +1,6 @@
+tsc script.ts
+code .
+python -m http.server 1234 # http://localhost:1234/
+n .\index.html
+todo: n todo.md # todo
+n .\README.md
