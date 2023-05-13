@@ -7,22 +7,23 @@
       content="width=device-width, initial-scale=1.0"
     />
     <title>Yard-Sale Simulation</title>
-    <script type="text/javascript" src="/script.js" defer></script>
+    <script type="text/javascript" src="./script.js" defer></script>
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💸</text></svg>"
     />
-    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="stylesheet" type="text/css" href="./style.css" />
   </head>
   <body>
-    <header></header>
+    <h1>Yard-Sale-Model</h1>
     <article>
-		<button id='btnStartStop' onclick="startStopGame(this)">start</button>
-		<button id='btnReset' onclick="resetGame(this)">reset</button>
-		<button id='btnFaster' onclick="faster(this)">faster</button>
-		<button id='btnFaster' onclick="muchFaster(this)">faster+++</button>
-		<button id='btnSlower' onclick="slower(this)">slower</button>
-		<button id='btnSlower' onclick="muchSlower(this)">slower++++</button>
+		<button id='btnStartStop' onclick="startStopGame(this)">▶️ play</button>
+		<button id='btnReset' onclick="resetGame(this)">🔁 reset</button>
+		<button id='btnFaster' onclick="faster(this)">➡️ faster</button>
+		<button id='btnMuchFaster' onclick="muchFaster(this)">⏩ faster+++</button>
+		<button id='btnSlower' onclick="slower(this)">⬅️ slower</button>
+		<button id='btnMuchSlower' onclick="muchSlower(this)">⏪ slower++++</button>
+    <button id='btnGiveLuck' onclick="giveLuck(this)" class="unlit" title="click this button to toggle whether clicking on a player will give them luck or take their luck">🍀 take luck</button>
 		<header id="summary"></header>
       <div id="board"></div>
 	  

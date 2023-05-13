@@ -1,6 +1,7 @@
 ﻿body {
   max-width: 90ch;
   padding: 2ch;
+  padding-top: 0;
   margin: auto;
   color: #eee;
   background: #333;
@@ -12,17 +13,42 @@ pre {
   white-space: pre-wrap;
 }
 .person {
-    border:1px solid black;
-    max-width:120px;
-    display:inline-block;
-    font-size:8pt;
+  border: 1px solid black;
+  margin:2px;
+  padding:2px;
+  max-width: 120px;
+  display: inline-block;
+  font-size: 8pt;
 }
-.person p { padding:0}
-.person[data-money]::after {
-   background-color:blue;
-   display:inline-block;
-   content:attr(data-money);
+.person p {
+  padding: 0;
 }
+/* .person[data-money]::after {
+  background-color: blue;
+  display: inline-block;
+  content: attr(data-money);
+} */
+
 progress {
-    max-width:120px;
+  display:block;
+  max-width: calc(100% - 4px);
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.unlit {
+  box-shadow: none;
+}
+.lit {
+  box-shadow: 0 0 3px #ff0, 0 0 7px #ff0;
+}
+
+p[data-luck]:not([data-luck="1"]) {
+  background-color: green;
+}
+h1 {
+  padding: 0;
+  margin-top:0;
+  font-family:sans-serif;
+  text-shadow:0 2px 2px #000;
 }

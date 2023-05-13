@@ -1,27 +1,30 @@
-var testMode = false; //true;
-var populationSize = 50;
-var betPercent = 20;
+var testMode = false;
+var populationSize = 30;
+var betPercent = 7;
 var frameDelay = 2000;
+var moneyPerPlayer = 100;
+var tradeValueFactor = 0.1;
 /* don't put anything before the call to 'onStart()' exception GLOBALS and have no more than 10. */
 /* on start... */
 function onStart() {
     startGame(false);
 }
 function startGame(startLoop) {
-    initGame(populationSize, betPercent, frameDelay, startLoop);
+    initGame(populationSize, betPercent, frameDelay, startLoop, moneyPerPlayer, tradeValueFactor);
 }
 var Person = /** @class */ (function () {
-    function Person(id, name, money) {
+    function Person(id, name, money, luck) {
         this.id = id;
         this.name = name;
         this.money = money;
+        this.luck = luck;
         this.wins = 0;
         this.losses = 0;
     }
     return Person;
 }());
 var Game = /** @class */ (function () {
-    function Game(populationSize, maxBetPercent, frameDelay) {
+    function Game(populationSize, maxBetPercent, frameDelay, moneyPerPlayer, tradeValueFactor) {
         this.Paused = true;
         this.FrameDelay = frameDelay !== null && frameDelay !== void 0 ? frameDelay : 100;
         this.NextId = 0;
@@ -29,12 +32,16 @@ var Game = /** @class */ (function () {
         this.MaxPopulationSize = populationSize !== null && populationSize !== void 0 ? populationSize : 100;
         this.MaxBetPercent = maxBetPercent !== null && maxBetPercent !== void 0 ? maxBetPercent : 20;
         this.People = [];
-        this.init();
+        this.GiniCoefficient = 0;
+        this.RichestPersonMoney = moneyPerPlayer !== null && moneyPerPlayer !== void 0 ? moneyPerPlayer : 100;
+        this.TradeValueFactor = tradeValueFactor !== null && tradeValueFactor !== void 0 ? tradeValueFactor : 0.1;
+        this.TotalWealth = (populationSize !== null && populationSize !== void 0 ? populationSize : 100) * (moneyPerPlayer !== null && moneyPerPlayer !== void 0 ? moneyPerPlayer : 100);
+        this.init(moneyPerPlayer);
     }
-    Game.prototype.init = function () {
+    Game.prototype.init = function (moneyPerPlayer) {
         for (var i = 0; i < this.MaxPopulationSize; i++) {
             var id = this.nextId();
-            var newPerson = new Person("p" + id, getName() + ' ' + getAvatar(), 100);
+            var newPerson = new Person("p" + id, getName() + ' ' + getAvatar(), moneyPerPlayer, 1.0);
             this.People.push(newPerson);
             //this.People["p"+ newPerson.id] = newPerson;
         }
@@ -42,47 +49,95 @@ var Game = /** @class */ (function () {
     Game.prototype.Tick = function () {
         // Sort them (randomly) into two groups
         this.People.sort(function (a, b) { return (Math.random() - 0.5); });
-        // Have each person in group a fight a random person in group b
+        // Have each person in group a trade a random person in group b
         var numPairs = Math.round(this.People.length / 2);
-        console.log("We are about to have " + numPairs + " fights....");
+        console.log("We are about to have " + numPairs + " trades....");
         for (var index in this.People) {
             if (index >= numPairs) {
                 break;
             }
-            this.Fight(this.People[index], this.People[(+index + numPairs)], this.MaxBetPercent);
+            this.Trade(this.People[index], this.People[(+index + numPairs)], this.MaxBetPercent, this.TradeValueFactor);
         }
+        this.CalculateGini();
         this.Rounds += 1;
     };
     Game.prototype.nextId = function () {
         return ++this.NextId;
     };
-    Game.prototype.Fight = function (a, b, maxBetPercent) {
-        //console.log(`Fight between ${a.name} (worth ${a.money}) and  ${b.name} (worth ${b.money})`);
+    Game.prototype.Trade = function (a, b, maxBetPercent, tradeValueFactor) {
+        //console.log(`Trade between ${a.name} (worth ${a.money}) and  ${b.name} (worth ${b.money})`);
         var maxBet = Math.min(a.money, b.money) * (maxBetPercent / 100);
-        //let winner = (Math.random() > 0.5) ? a : b;
+        // if a.luck > b.luck, then (a/(a+b)) is between (0.5 and 1), thus higher chance rand(0..1) < (number close to 1) - and winner is a.
+        var winner = (Math.random() < (a.luck / (a.luck + b.luck))) ? a : b;
         //console.log(`The winner is ${winner.name} who wins ${maxBet} (7% of the poorest player's money) !`);
         // winner is always a (the sorting into groups already picked winners)
-        //if (winner == a) {
-        a.money += maxBet;
-        a.wins += 1;
-        b.money -= maxBet;
-        b.losses += 1;
-        // } else {
-        //     //winner == b
-        //     b.money += maxBet;
-        //     b.wins += 1;
-        //     a.money -= maxBet;
-        //     a.losses += 1;
-        // }
-        //console.log(`Now ${a.name} has ${a.money}, and  ${b.name} has ${b.money}`);
+        if (winner == a) {
+            a.money += maxBet;
+            a.wins += 1;
+            b.money -= maxBet;
+            b.losses += 1;
+        }
+        else {
+            //winner == b
+            b.money += maxBet;
+            b.wins += 1;
+            a.money -= maxBet;
+            a.losses += 1;
+        }
+        if (a.luck != b.luck) {
+            console.log("Mismatched luck! a has " + a.luck + ", b has " + b.luck + ": winner has " + winner.luck + "!! " + ((winner.luck < a.luck || winner.luck < b.luck) ? "❌❌❌❌" : "🍀🍀🍀🍀"));
+        }
+        var pieGrowth = maxBet * tradeValueFactor;
+        // Do both people benefit in a trade?
+        // i.e. should I apply this code:
+        //a.money += pieGrowth;
+        //b.money += pieGrowth;
+        // In some trades yes -- both sides gain wealth -- but 
+        // If a trade participant:
+        // - has 0 wealth currently 
+        // - *and* has income <= expenses: 
+        // - every trade is an expense, not a transaction in which capital *can* be grown.
+        // Or just the winner? 
+        winner.money += pieGrowth;
+        //console.log(`Now ${a.name} has ${a.money}, and ${b.name} has ${b.money}`);
         // i doubt this return value is used... but just in case.
-        return a;
+        return winner;
+    };
+    Game.prototype.CalculateGini = function () {
+        this.People.sort(function (a, b) { return a.money - b.money; });
+        var wealthTotal = 0;
+        var peopleCount = this.People.length;
+        for (var _i = 0, _a = this.People; _i < _a.length; _i++) {
+            var person = _a[_i];
+            wealthTotal += person.money;
+        }
+        var cumulativeScore = 0;
+        var cumulativeFractionOfIncome = 0;
+        var i = 0;
+        for (var _b = 0, _c = this.People; _b < _c.length; _b++) {
+            var person = _c[_b];
+            i++;
+            var fractionOfPopulation = 1 / peopleCount;
+            var fractionOfIncome = person.money / wealthTotal;
+            cumulativeFractionOfIncome += fractionOfIncome;
+            var fractionOfRicherPopulation = 1 - cumulativeFractionOfIncome;
+            // score(B33) = fractionOfIncome(b17) * (fractionOfPopulation(b22)    +  2 * fractionOfRicherPopulation(b27))
+            var score = fractionOfIncome * (fractionOfPopulation + 2 * fractionOfRicherPopulation);
+            cumulativeScore += score;
+            // cumulativeTotal += person.money;
+            // let predictedCumulativeTotal = (i / peopleCount)  * wealthTotal;
+            // let actualCumulativeTotalVersusPredicted = cumulativeTotal / predictedCumulativeTotal;
+            // cumulativeDistance += actualCumulativeTotalVersusPredicted
+        }
+        this.GiniCoefficient = 1 - cumulativeScore;
+        return this.GiniCoefficient;
     };
     return Game;
 }());
 var TheGame;
-function initGame(populationSize, maxBetPercent, frameDelay, startLoop) {
-    TheGame = new Game(populationSize, maxBetPercent, frameDelay);
+function initGame(populationSize, maxBetPercent, frameDelay, startLoop, moneyPerPlayer, tradeValueFactor) {
+    TheGame = new Game(populationSize, maxBetPercent, frameDelay, moneyPerPlayer, tradeValueFactor);
+    //TheGame.People[12].luck = 7;
     initGameScreen(TheGame);
     updateGameScreen(TheGame);
     if (startLoop) {
@@ -134,14 +189,52 @@ function initGameScreen(game) {
         board.appendChild(personDiv);
     }
 }
+function updateGameSummary(game) {
+    var summaryElement = $id("summary");
+    if (summaryElement != null) {
+        summaryElement.innerHTML = "<p>Population: " + game.MaxPopulationSize + ", Max Bet: " + game.MaxBetPercent.toFixed(0) + "%, Rounds: " + game.Rounds + ", Speed: " + (2000 / game.FrameDelay).toFixed(2) + ", Gini: " + game.GiniCoefficient.toFixed(4) + ", Trade Value Factor: " + game.TradeValueFactor.toFixed(1) + "</p>";
+    }
+}
+function formatFloat(money) {
+    if (money < 0.000001)
+        return money.toFixed(8);
+    if (money < 0.00001)
+        return money.toFixed(7);
+    if (money < 0.0001)
+        return money.toFixed(6);
+    if (money < 0.001)
+        return money.toFixed(5);
+    if (money < 0.01)
+        return money.toFixed(4);
+    if (money < 0.1)
+        return money.toFixed(3);
+    if (money < 1)
+        return money.toFixed(2);
+    if (money < 10)
+        return money.toFixed(1);
+    if (money < 1000)
+        return money.toFixed(0);
+    if (money < 100000)
+        return (money / 1000).toFixed(2) + "K";
+    if (money < 100000000)
+        return (money / 1000000).toFixed(2) + "M";
+    if (money < 100000000000)
+        return (money / 1000000000).toFixed(2) + "B";
+    return money.toString();
+}
+function updatePersonPanel(person, maxValue) {
+    var personNode = $id(person.id);
+    if (personNode != null) {
+        var gamesPlayed = person.wins + person.losses;
+        var gamesPlayedNonZero = Math.max(gamesPlayed, 1); // This means if you've played none, you've won Zero %, not Nan%.
+        personNode.innerHTML = "<p data-luck='" + person.luck + "' onclick='pick(\"" + person.id + "\");'>" + person.name + " \uD83D\uDCB2" + formatFloat(person.money) + "<br />(won: " + (100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0) + "% - Luck: " + person.luck + ")</p>\n<progress id=\"file\" max=\"" + maxValue + "\" value=\"" + person.money + "\" title=\"" + person.money + "\"> " + person.money + " </progress>";
+    }
+}
 function updateGameScreen(game) {
     //console.log("Game",game);
     //for (const personId in game.People) {
     var _a, _b;
-    var summaryElement = $id("summary");
-    if (summaryElement != null) {
-        summaryElement.innerHTML = "<p>Population: " + game.MaxPopulationSize + ", Max Bet: " + game.MaxBetPercent.toFixed(0) + "%, Rounds: " + game.Rounds + ", Speed: " + (2000 / game.FrameDelay).toFixed(2) + "</p>";
-    }
+    updateGameSummary(game);
     var board = $id("board");
     if (board != null) {
         for (var index in game.People) {
@@ -160,14 +253,10 @@ function updateGameScreen(game) {
         var richest = allPlayers.item(allPlayers.length - 1);
         var minValue = parseFloat((_a = poorest.getAttribute("data-money")) !== null && _a !== void 0 ? _a : "0");
         var maxValue = parseFloat((_b = richest.getAttribute("data-money")) !== null && _b !== void 0 ? _b : "0");
+        game.RichestPersonMoney = maxValue;
         for (var index in game.People) {
             var person = game.People[index];
-            var personNode = $id(person.id);
-            if (personNode != null) {
-                var gamesPlayed = person.wins + person.losses;
-                var gamesPlayedNonZero = Math.max(gamesPlayed, 1); // This means if you've played none, you've won Zero %, not Nan%.
-                personNode.innerHTML = "<p>" + person.name + " (won: " + person.wins + "/" + gamesPlayed + ", " + (100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0) + "%)</p>\n<progress id=\"file\" max=\"" + maxValue + "\" value=\"" + person.money + "\"> " + person.money + " </progress>";
-            }
+            updatePersonPanel(person, maxValue);
         }
     }
     // And now sort them....
@@ -4843,12 +4932,12 @@ function startStopGame(btn) {
         return;
     if (TheGame.Paused) {
         //TheGame.Paused = false;
-        btn.innerText = "pause";
+        btn.innerText = "⏸️ pause";
         initLoop();
     }
     else {
         TheGame.Paused = true;
-        btn.innerText = "play";
+        btn.innerText = "▶️ play";
     }
 }
 function resetGame() {
@@ -4857,7 +4946,7 @@ function resetGame() {
     TheGame.Paused = true;
     var btn = $id('btnStartStop');
     if (btn !== null) {
-        btn.innerText = 'play';
+        btn.innerText = "▶️ play";
     }
     clearBoard();
     startGame(false);
@@ -4867,24 +4956,54 @@ function faster() {
         return;
     if (TheGame.FrameDelay > 0) {
         TheGame.FrameDelay = Math.max(1, TheGame.FrameDelay - 5);
+        updateGameSummary(TheGame);
     }
 }
 function slower() {
     if (TheGame == null)
         return;
     TheGame.FrameDelay = TheGame.FrameDelay + 5;
+    updateGameSummary(TheGame);
 }
 function muchFaster() {
     if (TheGame == null)
         return;
     if (TheGame.FrameDelay > 0) {
         TheGame.FrameDelay = Math.max(1, TheGame.FrameDelay - 150);
+        updateGameSummary(TheGame);
     }
 }
 function muchSlower() {
     if (TheGame == null)
         return;
     TheGame.FrameDelay = TheGame.FrameDelay + 150;
+    updateGameSummary(TheGame);
+}
+var LuckGivingMode = false;
+function giveLuck() {
+    //classList.add(className);
+    var btnGiveLuck = $id('btnGiveLuck');
+    if (btnGiveLuck == null)
+        return;
+    if (btnGiveLuck.classList.contains("unlit")) {
+        btnGiveLuck.classList.remove("unlit");
+        btnGiveLuck.classList.add("lit");
+        btnGiveLuck.innerText = "🍀 give luck";
+        LuckGivingMode = true;
+    }
+    else {
+        btnGiveLuck.classList.remove("lit");
+        btnGiveLuck.classList.add("unlit");
+        btnGiveLuck.innerText = "🍀 take luck";
+        LuckGivingMode = false;
+    }
+}
+function pick(personId) {
+    var person = TheGame === null || TheGame === void 0 ? void 0 : TheGame.People.find(function (p) { return p.id == personId; });
+    if (person != null && TheGame != null) {
+        person.luck += (LuckGivingMode ? 1 : -0.25);
+        updatePersonPanel(person, TheGame.RichestPersonMoney);
+    }
 }
 // START
 if (document.readyState !== 'loading') {
