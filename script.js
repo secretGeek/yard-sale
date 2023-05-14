@@ -92,12 +92,12 @@ var Game = /** @class */ (function () {
         // i.e. should I apply this code:
         //a.money += pieGrowth;
         //b.money += pieGrowth;
-        // In some trades yes -- both sides gain wealth -- but 
+        // In some trades yes -- both sides gain wealth -- but
         // If a trade participant:
-        // - has 0 wealth currently 
-        // - *and* has income <= expenses: 
+        // - has 0 wealth currently
+        // - *and* has income <= expenses:
         // - every trade is an expense, not a transaction in which capital *can* be grown.
-        // Or just the winner? 
+        // Or just the winner?
         winner.money += pieGrowth;
         //console.log(`Now ${a.name} has ${a.money}, and ${b.name} has ${b.money}`);
         // i doubt this return value is used... but just in case.
@@ -192,7 +192,7 @@ function initGameScreen(game) {
 function updateGameSummary(game) {
     var summaryElement = $id("summary");
     if (summaryElement != null) {
-        summaryElement.innerHTML = "<p>Population: " + game.MaxPopulationSize + ", Max Bet: " + game.MaxBetPercent.toFixed(0) + "%, Rounds: " + game.Rounds + ", Speed: " + (2000 / game.FrameDelay).toFixed(2) + ", Gini: " + game.GiniCoefficient.toFixed(4) + ", Trade Value Factor: " + game.TradeValueFactor.toFixed(1) + "</p>";
+        summaryElement.innerHTML = "<p>\n        <code>Population:</code> " + game.MaxPopulationSize + ", \n        <code>MaxBet%:</code> " + game.MaxBetPercent.toFixed(0) + "%, \n        <code>Rounds:</code> " + game.Rounds + ", \n        <code>PlaySpeed:</code> " + (41000 / (50 + game.FrameDelay)).toFixed(2) + ", \n        <code>TradeValueFactor:</code> " + game.TradeValueFactor.toFixed(1) + ", \n        <code>GiniCoefficient:</code> " + game.GiniCoefficient.toFixed(4) + ", \n        <code>TotalWealth:</code> \uD83D\uDCB2" + formatFloat(game.TotalWealth) + "</p>";
     }
 }
 function formatFloat(money) {
@@ -227,23 +227,26 @@ function updatePersonPanel(person, maxValue) {
     if (personNode != null) {
         var gamesPlayed = person.wins + person.losses;
         var gamesPlayedNonZero = Math.max(gamesPlayed, 1); // This means if you've played none, you've won Zero %, not Nan%.
-        personNode.innerHTML = "<p data-luck='" + person.luck + "' onclick='pick(\"" + person.id + "\");'>" + person.name + " \uD83D\uDCB2" + formatFloat(person.money) + "<br />(won: " + (100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0) + "% - Luck: " + person.luck + ")</p>\n<progress id=\"file\" max=\"" + maxValue + "\" value=\"" + person.money + "\" title=\"" + person.money + "\"> " + person.money + " </progress>";
+        personNode.innerHTML = "<p data-luck='" + person.luck + "' onclick='pick(\"" + person.id + "\");'>" + person.name + " \uD83D\uDCB2" + formatFloat(person.money) + "<br />(won: " + (100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0) + "% - Luck: " + person.luck + ")</p>\n        <progress id=\"file\" max=\"" + maxValue + "\" value=\"" + person.money + "\" title=\"" + person.money + "\"> " + person.money + " </progress>";
     }
 }
 function updateGameScreen(game) {
     //console.log("Game",game);
     //for (const personId in game.People) {
     var _a, _b;
-    updateGameSummary(game);
     var board = $id("board");
     if (board != null) {
+        var totalWealth = 0;
         for (var index in game.People) {
             var person = game.People[index];
             var personNode = $id(person.id);
             if (personNode != null) {
                 personNode.setAttribute("data-money", person.money.toFixed(2));
             }
+            totalWealth += person.money;
         }
+        game.TotalWealth = totalWealth;
+        updateGameSummary(game);
         Array.from(board.querySelectorAll('.person'))
             .sort(function (a, b) { var _a, _b; return parseFloat((_a = a.getAttribute("data-money")) !== null && _a !== void 0 ? _a : "0") - parseFloat((_b = b.getAttribute("data-money")) !== null && _b !== void 0 ? _b : "0"); })
             //.sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
@@ -260,7 +263,7 @@ function updateGameScreen(game) {
         }
     }
     // And now sort them....
-    //let people = 
+    //let people =
     //TODO: DRAW game...
 }
 /* UTILITY */

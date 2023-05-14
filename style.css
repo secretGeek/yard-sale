@@ -52,3 +52,12 @@ h1 {
   font-family:sans-serif;
   text-shadow:0 2px 2px #000;
 }
+a {
+  color:#48C;
+}
+a:hover {
+  color:#6F8;
+}
+a:active {
+  color:#FF0;
+}

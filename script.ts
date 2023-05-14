@@ -240,7 +240,14 @@ function initGameScreen(game: Game) {
 function updateGameSummary(game: Game) {
     const summaryElement = $id("summary");
     if (summaryElement != null) {
-        summaryElement.innerHTML = `<p>Population: ${game.MaxPopulationSize}, Max Bet: ${game.MaxBetPercent.toFixed(0)}%, Rounds: ${game.Rounds}, Speed: ${(2000 / game.FrameDelay).toFixed(2)}, Gini: ${game.GiniCoefficient.toFixed(4)}, Trade Value Factor: ${game.TradeValueFactor.toFixed(1)}, Total Wealth: 💲${game.TotalWealth}</p>`;
+        summaryElement.innerHTML = `<p>
+        <code>Population:</code> ${game.MaxPopulationSize}, 
+        <code>MaxBet%:</code> ${game.MaxBetPercent.toFixed(0)}%, 
+        <code>Rounds:</code> ${game.Rounds}, 
+        <code>PlaySpeed:</code> ${(41000 / (50 + game.FrameDelay)).toFixed(2)}, 
+        <code>TradeValueFactor:</code> ${game.TradeValueFactor.toFixed(1)}, 
+        <code>GiniCoefficient:</code> ${game.GiniCoefficient.toFixed(4)}, 
+        <code>TotalWealth:</code> 💲${formatFloat(game.TotalWealth)}</p>`;
     }
 }
 
@@ -265,9 +272,11 @@ function updatePersonPanel(person: Person, maxValue: number) {
         const gamesPlayed = person.wins + person.losses;
         const gamesPlayedNonZero = Math.max(gamesPlayed, 1); // This means if you've played none, you've won Zero %, not Nan%.
         personNode.innerHTML = `<p data-luck='${person.luck}' onclick='pick("${person.id}");'>${person.name} 💲${formatFloat(person.money)}<br />(won: ${(100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0)}% - Luck: ${person.luck})</p>
-<progress id="file" max="${maxValue}" value="${person.money}" title="${person.money}"> ${person.money} </progress>`;
+        <progress id="file" max="${maxValue}" value="${person.money}" title="${person.money}"> ${person.money} </progress>`;
     }
 }
+
+
 function updateGameScreen(game: Game) {
     //console.log("Game",game);
     //for (const personId in game.People) {

@@ -1,4 +1,4 @@
 edit: code .
 watch: tsc script.ts --watch
-serve: browse "https://localhost:1234"; python -m http.server 1234;
+serve: browse "http://localhost:1234"; python -m http.server 1234;
 n .\README.md
