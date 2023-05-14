@@ -21,11 +21,11 @@ But what the Yard Sale Model instead shows is that, although an individual's wea
 
 The Yard Sale Model is used to demonstrate that wealth accumulation can arise naturally, even in a seemingly "fair" system, and without any variation in "skill" between players.
 
-There are variants of the Yard Sale Model where extra factors are applied. For example, the application of a "tax" after each round, which moves each player some distance closer to the mean (i.e. robbing the rich and giving to the poor) -- and its been shown that such models can, with the right factors, achieve a steady state with very similar wealth distribution to those that are observed in modern societies.
+There are variants of the Yard Sale Model where extra factors are applied. For example, the application of a "tax" after each round, which moves each player some distance closer to the mean (i.e. "robbing the rich and giving to the poor") -- and its been shown that such models can, with the right factors, achieve a steady state with very similar wealth distribution to those observed in modern societies.
 
 Critics of the Yard Sale Model indicate that "true" trades are not the same as these "zero-sum" gambles. For example, if I buy milk from a dairy farmer, I buy it because its value *to me* (thirsty for milk) is greater than the value it has for the farmer (who is not thirsty for milk) -- hence "value" is created in real trades.
 
-I've built this simulation in order to look at ways to model "non-zero sum" trades. It's quite difficult in practice to find a model that realistically depicts the "non-zero" nature of trades. Which trades are really non-zero? If i'm the final consumer of a product (e.g. milk, or cigarettes) then I'm not really gaining more than I've paid. I feel that to do the concept justice I may need to add labor, and labor-productivity factors.
+I've built this simulation with the -- as yet unrealised -- intention of looking at ways to model "non-zero sum" trades. It's quite difficult in practice to find a simple model that realistically depicts the "non-zero" nature of trades. Which trades are really non-zero? If i'm the final consumer of a product (e.g. milk, or cigarettes) then I'm not really gaining more than I've paid or growing my wealth. I feel that to do the concept justice I may need to add labor, and labor-productivity factors.
 
 ## References
 
