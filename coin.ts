@@ -1,9 +1,10 @@
 let testMode = false;
 let populationSize = 30;
-let betPercent = 7;
+let winPercent = 60;
+let lossPercent = 40;
 let frameDelay = 2000;
 let moneyPerPlayer = 100;
-let tradeValueFactor = 0.0;
+
 /* don't put anything before the call to 'onStart()' exception GLOBALS and have no more than 10. */
 /* on start... */
 function onStart() {
@@ -11,15 +12,15 @@ function onStart() {
 }
 
 function startGame(startLoop: boolean) {
-    initGame(populationSize, betPercent, frameDelay, startLoop, moneyPerPlayer, tradeValueFactor);
+    initGame(populationSize, winPercent, lossPercent, frameDelay, startLoop, moneyPerPlayer);
 }
 
 class Person {
-    constructor(id: string, name: string, money: number, luck: number) {
+    constructor(id: string, name: string, money: number) {
         this.id = id;
         this.name = name;
         this.money = money;
-        this.luck = luck;
+        //this.luck = luck;
         this.wins = 0;
         this.losses = 0;
     }
@@ -31,21 +32,22 @@ class Person {
     money: number;
     wins: number;
     losses: number;
-    luck: number;
+    //luck: number;
 }
 
 class Game {
-    constructor(populationSize: number | null, maxBetPercent: number | null, frameDelay: number | null, moneyPerPlayer: number, tradeValueFactor: number) {
+    //constructor(populationSize: number | null, maxBetPercent: number | null, frameDelay: number | null, moneyPerPlayer: number, tradeValueFactor: number) {
+        constructor(populationSize: number | null, winPercent: number | null, lossPercent: number | null, frameDelay: number | null, moneyPerPlayer: number) {
         this.Paused = true;
         this.FrameDelay = frameDelay ?? 100;
         this.NextId = 0;
         this.Rounds = 0;
         this.MaxPopulationSize = populationSize ?? 100;
-        this.MaxBetPercent = maxBetPercent ?? 20;
+        this.WinPercent = winPercent ?? 60;
+        this.LossPercent = lossPercent ?? 40;
         this.People = [];
         this.GiniCoefficient = 0;
         this.RichestPersonMoney = moneyPerPlayer ?? 100;
-        this.TradeValueFactor = tradeValueFactor ?? 0.0;
         this.TotalWealth = (populationSize ?? 100) * (moneyPerPlayer ?? 100);
         this.init(moneyPerPlayer);
     }
@@ -54,10 +56,9 @@ class Game {
     FrameDelay: number;
     NextId: number;
     MaxPopulationSize: number;
-    MaxBetPercent: number;
-    TradeValueFactor: number;
+    WinPercent: number;
+    LossPercent: number;
     Rounds: number; //Number of rounds that have been played
-    //People: { [id: string]: Person }; //id's start with "p"
     People: Person[]; //id's start with "p"
     RichestPersonMoney: number;
     GiniCoefficient: number;
@@ -66,22 +67,17 @@ class Game {
     init(moneyPerPlayer: number): void {
         for (let i: number = 0; i < this.MaxPopulationSize; i++) {
             let id = this.nextId();
-            let newPerson = new Person("p" + <string><unknown>id, getName() + ' ' + getAvatar(), moneyPerPlayer, 1.0);
+            let newPerson = new Person("p" + <string><unknown>id, getName() + ' ' + getAvatar(), moneyPerPlayer);
             this.People.push(newPerson);
-            //this.People["p"+ newPerson.id] = newPerson;
         }
     }
     Tick(): void {
         // Sort them (randomly) into two groups
-        this.People.sort((a, b) => (Math.random() - 0.5));
-        // Have each person in group a trade a random person in group b
-        const numPairs: number = Math.round(this.People.length / 2);
-        console.log(`We are about to have ${numPairs} trades....`);
-        for (const index in this.People) {
-            if (<number><unknown>index >= numPairs) {
-                break;
-            }
-            this.Trade(this.People[index], this.People[(+<number><unknown>index + numPairs)], this.MaxBetPercent, this.TradeValueFactor)
+        // Have each person play coin toss against the bank...
+        const numPeople: number = this.People.length;
+        console.log(`We are about to have ${numPeople} coin tosses....`);
+         for (const index in this.People) {
+            this.CoinToss(this.People[index], this.WinPercent, this.LossPercent);
         }
         this.CalculateGini();
         this.Rounds += 1;
@@ -89,58 +85,33 @@ class Game {
     nextId(): number {
         return ++this.NextId;
     }
-    Trade(a: Person, b: Person, maxBetPercent: number, tradeValueFactor: number): Person {
-        //console.log(`Trade between ${a.name} (worth ${a.money}) and  ${b.name} (worth ${b.money})`);
-        const maxBet = Math.min(a.money, b.money) * (maxBetPercent / 100);
-        // if a.luck > b.luck, then (a/(a+b)) is between (0.5 and 1), thus higher chance rand(0..1) < (number close to 1) - and winner is a.
-        let winner = (Math.random() < (a.luck / (a.luck + b.luck))) ? a : b;
-        //console.log(`The winner is ${winner.name} who wins ${maxBet} (7% of the poorest player's money) !`);
-        // winner is always a (the sorting into groups already picked winners)
-
-        if (winner == a) {
-            a.money += maxBet;
-            a.wins += 1;
-            b.money -= maxBet;
-            b.losses += 1;
+    CoinToss(a: Person, winPercent: number, lossPercent: number) : Person {
+        let theyWon = (Math.random() < 0.5);
+        if (theyWon) {
+            console.log(`They won!`);
         } else {
-            //winner == b
-            b.money += maxBet;
-            b.wins += 1;
-            a.money -= maxBet;
+            console.log(`They did not win.`);
+        }
+
+        if (theyWon) {
+            a.money += (a.money * (winPercent/100.0));
+            a.wins+=1;
+        } else {
+            a.money -= (a.money * (lossPercent/100.0));
             a.losses += 1;
-        }
-        if (a.luck != b.luck) {
-            console.log(`Mismatched luck! a has ${a.luck}, b has ${b.luck}: winner has ${winner.luck}!! ${(winner.luck < a.luck || winner.luck < b.luck)? "❌❌❌❌" : "🍀🍀🍀🍀"}`);
-        }
-        const pieGrowth = maxBet * tradeValueFactor;
-
-        // Do both people benefit in a trade?
-        // i.e. should I apply this code:
-
-        //a.money += pieGrowth;
-        //b.money += pieGrowth;
-
-        // In some trades yes -- both sides gain wealth -- but
-
-        // If a trade participant:
-        // - has 0 wealth currently
-        // - *and* has income <= expenses:
-        // - every trade is an expense, not a transaction in which capital *can* be grown.
-
-        // Or just the winner?
-
-        winner.money += pieGrowth;
-        //console.log(`Now ${a.name} has ${a.money}, and ${b.name} has ${b.money}`);
-        // i doubt this return value is used... but just in case.
-        return winner;
+        }    
+        return a;
     }
+
     CalculateGini(): number {
         this.People.sort((a, b) => a.money - b.money);
         let wealthTotal = 0;
         let peopleCount = this.People.length;
+
         for (const person of this.People) {
             wealthTotal += person.money;
         }
+
         let cumulativeScore = 0;
         let cumulativeFractionOfIncome = 0;
         let i = 0;
@@ -150,15 +121,10 @@ class Game {
             let fractionOfIncome = person.money / wealthTotal;
             cumulativeFractionOfIncome += fractionOfIncome;
             let fractionOfRicherPopulation = 1 - cumulativeFractionOfIncome;
-            // score(B33) = fractionOfIncome(b17) * (fractionOfPopulation(b22)    +  2 * fractionOfRicherPopulation(b27))
             let score = fractionOfIncome * (fractionOfPopulation + 2 * fractionOfRicherPopulation)
             cumulativeScore += score;
-            // cumulativeTotal += person.money;
-
-            // let predictedCumulativeTotal = (i / peopleCount)  * wealthTotal;
-            // let actualCumulativeTotalVersusPredicted = cumulativeTotal / predictedCumulativeTotal;
-            // cumulativeDistance += actualCumulativeTotalVersusPredicted
         }
+
         this.GiniCoefficient = 1 - cumulativeScore;
 
         return this.GiniCoefficient;
@@ -174,9 +140,8 @@ interface PersonType {
 
 let TheGame: Game | undefined;
 
-function initGame(populationSize: number, maxBetPercent: number, frameDelay: number, startLoop: boolean, moneyPerPlayer: number, tradeValueFactor:number) {
-    TheGame = new Game(populationSize, maxBetPercent, frameDelay, moneyPerPlayer, tradeValueFactor);
-    //TheGame.People[12].luck = 7;
+function initGame(populationSize: number, winPercent: number, lossPercent:number, frameDelay: number, startLoop: boolean, moneyPerPlayer: number) {
+    TheGame = new Game(populationSize, winPercent, lossPercent, frameDelay, moneyPerPlayer);
     initGameScreen(TheGame);
     updateGameScreen(TheGame);
     if (startLoop) {
@@ -242,10 +207,10 @@ function updateGameSummary(game: Game) {
     if (summaryElement != null) {
         summaryElement.innerHTML = `<p>
         <code>Population:</code> ${game.MaxPopulationSize}, 
-        <code>MaxBet%:</code> ${game.MaxBetPercent.toFixed(0)}%, 
+        <code>WinPercent%:</code> ${game.WinPercent.toFixed(0)}%, 
+        <code>LossPercent%:</code> ${game.LossPercent.toFixed(0)}%, 
         <code>Rounds:</code> ${game.Rounds}, 
         <code>PlaySpeed:</code> ${(41000 / (50 + game.FrameDelay)).toFixed(2)}, 
-        ${(game.TradeValueFactor <= 0 ? "" : `<code>TradeValueFactor:</code> ${game.TradeValueFactor.toFixed(1)},`)}
         <code>GiniCoefficient:</code> ${game.GiniCoefficient.toFixed(4)}, 
         <code>TotalWealth:</code> 💲${formatFloat(game.TotalWealth)}</p>`;
     }
@@ -271,17 +236,14 @@ function updatePersonPanel(person: Person, maxValue: number) {
     if (personNode != null) {
         const gamesPlayed = person.wins + person.losses;
         const gamesPlayedNonZero = Math.max(gamesPlayed, 1); // This means if you've played none, you've won Zero %, not Nan%.
-        personNode.innerHTML = `<p data-luck='${person.luck}' onclick='pick("${person.id}");'>${person.name} 💲${formatFloat(person.money)}<br />(won: ${(100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0)}% - Luck: ${person.luck})</p>
+        personNode.innerHTML = `<p onclick='pick("${person.id}");'>${person.name} 💲${formatFloat(person.money)}<br />(won: ${(100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0)}%)</p>
         <progress id="file" max="${maxValue}" value="${person.money}" title="${person.money}"> ${person.money} </progress>`;
     }
 }
 
-
 function updateGameScreen(game: Game) {
     //console.log("Game",game);
     //for (const personId in game.People) {
-
-    
 
     const board = $id("board");
     if (board != null) {
@@ -295,6 +257,7 @@ function updateGameScreen(game: Game) {
             }
             totalWealth+= person.money;
         }
+
         game.TotalWealth = totalWealth;
 
         updateGameSummary(game);
@@ -4999,14 +4962,6 @@ function getName() {
     return randomItem(names);
 }
 
-
-
-
-
-
-
-
-
 // for (let [key, value] of Object.entries(game.AllPeopleTypes)) {
 // for (let s of $("#" + column + " .inner .story .points")) {
 //   for (const key in stories) {
@@ -5063,31 +5018,31 @@ function muchSlower() {
     updateGameSummary(TheGame);
 }
 
-let LuckGivingMode = false;
-function giveLuck() {
-    //classList.add(className);
-    let btnGiveLuck = $id('btnGiveLuck');
-    if (btnGiveLuck == null) return;
-    if (btnGiveLuck.classList.contains("unlit")) {
-        btnGiveLuck.classList.remove("unlit");
-        btnGiveLuck.classList.add("lit");
-        btnGiveLuck.innerText = "🍀 give luck";
-        LuckGivingMode = true;
-    } else {
-        btnGiveLuck.classList.remove("lit");
-        btnGiveLuck.classList.add("unlit");
-        btnGiveLuck.innerText = "🍀 take luck";
-        LuckGivingMode = false;
-    }
-}
-function pick(personId: string) {
-    let person = TheGame?.People.find(p => p.id == personId);
-    if (person != null && TheGame != null) {
-        person.luck += (LuckGivingMode ? 1 : -0.25);
-        updatePersonPanel(person, TheGame.RichestPersonMoney);
-    }
+//let LuckGivingMode = false;
+// function giveLuck() {
+//     //classList.add(className);
+//     let btnGiveLuck = $id('btnGiveLuck');
+//     if (btnGiveLuck == null) return;
+//     if (btnGiveLuck.classList.contains("unlit")) {
+//         btnGiveLuck.classList.remove("unlit");
+//         btnGiveLuck.classList.add("lit");
+//         btnGiveLuck.innerText = "🍀 give luck";
+//         LuckGivingMode = true;
+//     } else {
+//         btnGiveLuck.classList.remove("lit");
+//         btnGiveLuck.classList.add("unlit");
+//         btnGiveLuck.innerText = "🍀 take luck";
+//         LuckGivingMode = false;
+//     }
+// }
 
-}
+// function pick(personId: string) {
+//     let person = TheGame?.People.find(p => p.id == personId);
+//     if (person != null && TheGame != null) {
+//         //person.luck += (LuckGivingMode ? 1 : -0.25);
+//         updatePersonPanel(person, TheGame.RichestPersonMoney);
+//     }
+// }
 // START
 if (document.readyState !== 'loading') {
     onStart();

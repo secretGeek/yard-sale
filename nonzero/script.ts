@@ -3,7 +3,7 @@ let populationSize = 30;
 let betPercent = 7;
 let frameDelay = 2000;
 let moneyPerPlayer = 100;
-let tradeValueFactor = 0.0;
+let tradeValueFactor = 0.01;
 /* don't put anything before the call to 'onStart()' exception GLOBALS and have no more than 10. */
 /* on start... */
 function onStart() {
@@ -117,8 +117,8 @@ class Game {
         // Do both people benefit in a trade?
         // i.e. should I apply this code:
 
-        //a.money += pieGrowth;
-        //b.money += pieGrowth;
+        a.money += pieGrowth;
+        b.money += pieGrowth;
 
         // In some trades yes -- both sides gain wealth -- but
 
@@ -129,7 +129,7 @@ class Game {
 
         // Or just the winner?
 
-        winner.money += pieGrowth;
+        //winner.money += pieGrowth;
         //console.log(`Now ${a.name} has ${a.money}, and ${b.name} has ${b.money}`);
         // i doubt this return value is used... but just in case.
         return winner;
@@ -245,7 +245,7 @@ function updateGameSummary(game: Game) {
         <code>MaxBet%:</code> ${game.MaxBetPercent.toFixed(0)}%, 
         <code>Rounds:</code> ${game.Rounds}, 
         <code>PlaySpeed:</code> ${(41000 / (50 + game.FrameDelay)).toFixed(2)}, 
-        ${(game.TradeValueFactor <= 0 ? "" : `<code>TradeValueFactor:</code> ${game.TradeValueFactor.toFixed(1)},`)}
+        ${(game.TradeValueFactor <= 0 ? "" : `<code>TradeValueFactor:</code> ${(game.TradeValueFactor * 100).toFixed(0)}%,`)}
         <code>GiniCoefficient:</code> ${game.GiniCoefficient.toFixed(4)}, 
         <code>TotalWealth:</code> 💲${formatFloat(game.TotalWealth)}</p>`;
     }
@@ -5088,6 +5088,7 @@ function pick(personId: string) {
     }
 
 }
+
 // START
 if (document.readyState !== 'loading') {
     onStart();

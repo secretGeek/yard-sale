@@ -25,7 +25,16 @@ There are variants of the Yard Sale Model where extra factors are applied. For e
 
 Critics of the Yard Sale Model indicate that "true" trades are not the same as these "zero-sum" gambles. For example, if I buy milk from a dairy farmer, I buy it because its value *to me* (thirsty for milk) is greater than the value it has for the farmer (who is not thirsty for milk) -- hence "value" is created in real trades.
 
-I've built this simulation with the -- as yet unrealised -- intention of looking at ways to model "non-zero sum" trades. It's quite difficult in practice to find a simple model that realistically depicts the "non-zero" nature of trades. Which trades are really non-zero? If i'm the final consumer of a product (e.g. milk, or cigarettes) then I'm not really gaining more than I've paid or growing my wealth. I feel that to do the concept justice I may need to add labor, and labor-productivity factors.
+## Variation with "non-zero sum" trades
+
+One of the criticisms of the Yard-Sale Model is that it involves "zero-sum" trades. People like to claim that when value is created by the trades, the "magic hand" of the market somehow distributes the wealth more evenly.
+
+I've built a variation of the simulation with "non-zero sum" trades.
+
+It's quite difficult in practice to find a simple model that realistically depicts the "non-zero" nature of trades. Which trades are really non-zero? If i'm the final consumer of a product (e.g. milk, or cigarettes) then I'm not really gaining more than I've paid for a commodity, and I'm certainly not growing my wealth. Yet, the model shows that even if we pretended that both parties of a trade were gaining value in each trade, the gigantic wealth disparity still arises.
+
+See the non-zero-sum variant here: **[Yard Sale Model Simulation](https://secretgeek.github.io/yard-sale/nonzero/)**
+
 
 ## References
 

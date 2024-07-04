@@ -36,6 +36,7 @@
     <li><code>MaxBet%:</code>  <p>In each trade (or gamble) the amount being bet is equal to the <code>MaxBet</code>% of the poorer player. For example, if we choose "<code>20%</code>" as the max betting percentage, and the two players betting have wealth of $100 and $1 million dollars, respectively, then the "stakes" they are gambling for would be <code>$20</code> as this is <code>20%</code> of the poorer player's wealth.</p></li>
     <li><code>Rounds:</code> <p>How many rounds have been played? A round consists of every player participating in 1 bet.</p></li>
     <li><code>PlaySpeed:</code> <p>How fast is the simulation running.</p> </li>
+    <li><strong><code class="hilite">TradeValueFactor:</code> <p>This is a variant of the original yard-sale-model. In each trade, I have the winner also win an extra amount. For example if the <code>TradeValueFactor</code> is <code>0.1</code>, then instead of winning <code>$20</code> they would win an <em>extra</em> <code>0.1 * $20 = $2</code>, and receive <code>$22</code></p></strong></li>
     <li><code>GiniCoefficient:</code> <p>A measure of the inequality of a population. 0 means perfect equality (everyone has the same wealth), 1 means perfect oligarchy (every has no money, except one person who has all the wealth)</p></li>
     <li><code>TotalWealth:</code> Sum of each player's money. Initially the same as <code>populationSize * moneyPerPlayer</code>. If trades are zero sum, then this stays constant.</li>
     </ul>

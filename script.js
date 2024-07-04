@@ -3,7 +3,7 @@ var populationSize = 30;
 var betPercent = 7;
 var frameDelay = 2000;
 var moneyPerPlayer = 100;
-var tradeValueFactor = 0.1;
+var tradeValueFactor = 0.0;
 /* don't put anything before the call to 'onStart()' exception GLOBALS and have no more than 10. */
 /* on start... */
 function onStart() {
@@ -34,7 +34,7 @@ var Game = /** @class */ (function () {
         this.People = [];
         this.GiniCoefficient = 0;
         this.RichestPersonMoney = moneyPerPlayer !== null && moneyPerPlayer !== void 0 ? moneyPerPlayer : 100;
-        this.TradeValueFactor = tradeValueFactor !== null && tradeValueFactor !== void 0 ? tradeValueFactor : 0.1;
+        this.TradeValueFactor = tradeValueFactor !== null && tradeValueFactor !== void 0 ? tradeValueFactor : 0.0;
         this.TotalWealth = (populationSize !== null && populationSize !== void 0 ? populationSize : 100) * (moneyPerPlayer !== null && moneyPerPlayer !== void 0 ? moneyPerPlayer : 100);
         this.init(moneyPerPlayer);
     }
@@ -192,7 +192,7 @@ function initGameScreen(game) {
 function updateGameSummary(game) {
     var summaryElement = $id("summary");
     if (summaryElement != null) {
-        summaryElement.innerHTML = "<p>\n        <code>Population:</code> " + game.MaxPopulationSize + ", \n        <code>MaxBet%:</code> " + game.MaxBetPercent.toFixed(0) + "%, \n        <code>Rounds:</code> " + game.Rounds + ", \n        <code>PlaySpeed:</code> " + (41000 / (50 + game.FrameDelay)).toFixed(2) + ", \n        <code>TradeValueFactor:</code> " + game.TradeValueFactor.toFixed(1) + ", \n        <code>GiniCoefficient:</code> " + game.GiniCoefficient.toFixed(4) + ", \n        <code>TotalWealth:</code> \uD83D\uDCB2" + formatFloat(game.TotalWealth) + "</p>";
+        summaryElement.innerHTML = "<p>\n        <code>Population:</code> " + game.MaxPopulationSize + ", \n        <code>MaxBet%:</code> " + game.MaxBetPercent.toFixed(0) + "%, \n        <code>Rounds:</code> " + game.Rounds + ", \n        <code>PlaySpeed:</code> " + (41000 / (50 + game.FrameDelay)).toFixed(2) + ", \n        " + (game.TradeValueFactor <= 0 ? "" : "<code>TradeValueFactor:</code> " + game.TradeValueFactor.toFixed(1) + ",") + "\n        <code>GiniCoefficient:</code> " + game.GiniCoefficient.toFixed(4) + ", \n        <code>TotalWealth:</code> \uD83D\uDCB2" + formatFloat(game.TotalWealth) + "</p>";
     }
 }
 function formatFloat(money) {

@@ -3,7 +3,7 @@ let populationSize = 30;
 let betPercent = 7;
 let frameDelay = 2000;
 let moneyPerPlayer = 100;
-let tradeValueFactor = 0.0;
+let tradeValueFactor = 0.1;
 /* don't put anything before the call to 'onStart()' exception GLOBALS and have no more than 10. */
 /* on start... */
 function onStart() {
@@ -45,7 +45,7 @@ class Game {
         this.People = [];
         this.GiniCoefficient = 0;
         this.RichestPersonMoney = moneyPerPlayer ?? 100;
-        this.TradeValueFactor = tradeValueFactor ?? 0.0;
+        this.TradeValueFactor = tradeValueFactor ?? 0.1;
         this.TotalWealth = (populationSize ?? 100) * (moneyPerPlayer ?? 100);
         this.init(moneyPerPlayer);
     }
@@ -245,7 +245,7 @@ function updateGameSummary(game: Game) {
         <code>MaxBet%:</code> ${game.MaxBetPercent.toFixed(0)}%, 
         <code>Rounds:</code> ${game.Rounds}, 
         <code>PlaySpeed:</code> ${(41000 / (50 + game.FrameDelay)).toFixed(2)}, 
-        ${(game.TradeValueFactor <= 0 ? "" : `<code>TradeValueFactor:</code> ${game.TradeValueFactor.toFixed(1)},`)}
+        <code>TradeValueFactor:</code> ${game.TradeValueFactor.toFixed(1)}, 
         <code>GiniCoefficient:</code> ${game.GiniCoefficient.toFixed(4)}, 
         <code>TotalWealth:</code> 💲${formatFloat(game.TotalWealth)}</p>`;
     }
