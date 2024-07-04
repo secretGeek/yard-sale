@@ -33,7 +33,7 @@ I've built a variation of the simulation with "non-zero sum" trades.
 
 It's quite difficult in practice to find a simple model that realistically depicts the "non-zero" nature of trades. Which trades are really non-zero? If i'm the final consumer of a product (e.g. milk, or cigarettes) then I'm not really gaining more than I've paid for a commodity, and I'm certainly not growing my wealth. Yet, the model shows that even if we pretended that both parties of a trade were gaining value in each trade, the gigantic wealth disparity still arises.
 
-See the non-zero-sum variant here: **[Yard Sale Model Simulation](https://secretgeek.github.io/yard-sale/nonzero/)**
+See the non-zero-sum variant here: **[Non-Zero-Sum Yard Sale Model Simulation](https://secretgeek.github.io/yard-sale/nonzero/)**
 
 
 ## More Variations
