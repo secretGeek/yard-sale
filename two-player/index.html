@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta
+      charset="utf-8"
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Yard-Sale Simulation</title>
+    <script type="text/javascript" src="./script.js" defer></script>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💸</text></svg>"
+    />
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+  </head>
+  <body>
+    <h1>Yard-Sale-Model</h1>
+    <article>
+		<button id='btnStartStop' onclick="startStopGame(this)">▶️ play</button>
+		<button id='btnReset' onclick="resetGame(this)">🔁 reset</button>
+		<button id='btnFaster' onclick="faster(this)">➡️ faster</button>
+		<button id='btnMuchFaster' onclick="muchFaster(this)">⏩ faster+++</button>
+		<button id='btnSlower' onclick="slower(this)">⬅️ slower</button>
+		<button id='btnMuchSlower' onclick="muchSlower(this)">⏪ slower++++</button>
+    <button id='btnGiveLuck' onclick="giveLuck(this)" class="unlit" title="click this button to toggle whether clicking on a player will give them luck or take their luck">🍀 take luck</button>
+		<header id="summary"></header>
+      <div id="board"></div>
+	  
+    </article>
+    <hr />
+    <article>
+    <h2>Description of game constants and values</h2>
+    <ul>
+    <li><code>Population:</code> <p>The number of participants</p></li>
+    <li><code>MaxBet%:</code>  <p>In each trade (or gamble) the amount being bet is equal to the <code>MaxBet</code>% of the poorer player. For example, if we choose "<code>20%</code>" as the max betting percentage, and the two players betting have wealth of $100 and $1 million dollars, respectively, then the "stakes" they are gambling for would be <code>$20</code> as this is <code>20%</code> of the poorer player's wealth.</p></li>
+    <li><code>Rounds:</code> <p>How many rounds have been played? A round consists of every player participating in 1 bet.</p></li>
+    <li><code>PlaySpeed:</code> <p>How fast is the simulation running.</p> </li>
+    <li><code>GiniCoefficient:</code> <p>A measure of the inequality of a population. 0 means perfect equality (everyone has the same wealth), 1 means perfect oligarchy (every has no money, except one person who has all the wealth)</p></li>
+    <li><code>TotalWealth:</code> Sum of each player's money. Initially the same as <code>populationSize * moneyPerPlayer</code>. If trades are zero sum, then this stays constant.</li>
+    </ul>
+    <p><a href='https://github.com/secretGeek/yard-sale#readme'>Source code and further explanation is on Github/@secretGeek/yard-sale</a></p>
+    </article>
+    <footer></footer>
+  </body>
+  <script></script>
+</html>

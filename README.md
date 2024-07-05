@@ -36,13 +36,22 @@ It's quite difficult in practice to find a simple model that realistically depic
 See the non-zero-sum variant here: **[Non-Zero-Sum Yard Sale Model Simulation](https://secretgeek.github.io/yard-sale/nonzero/)**
 
 
+## Income Tax with Universal Income
+
+In this version, we have income tax, applied only to the wealthiest 50% of people. Hence, if a "rich person" wins, their winnings are taxed. If a "poor person" wins, they are not taxed. All tax collected within a round is re-distributed to everyone equally.
+
+As long as the taxation rate is high enough, it does a faily good job of keeping the economy healthy. There's still some inequality, but it doesn't drive toward oligarchy.
+
+See the income-tax with Universal income variant here: **[Yard-Sale-Model with Income Tax and Universal Income](https://secretgeek.github.io/yard-sale/taxation/)**
+
+
 ## More Variations
 
 I'd like to explore so many variations of this!
 
-Progressive taxation is the first thing I'd like to add. Done well, progressive taxation works wonder on this yard-sale model.
+I'd like to add a "taxation under lobbying" variant.
 
-Then I'd like to add a "taxation under lobbying" variant. In this system there would, initially, be progressive taxation. But after every (say) 20 rounds there would also be the opportunity for each participant to "lobby" on how the tax model should change. Their lobbying position would align with their own self-interest (those below the median wealth would lobby for more progressive taxation, those above would lobby for less progressive taxation. And the catch is: the power of their lobbying depends on how much wealth they have.
+In this system there would, initially, be progressive taxation. But after every (say) 20 rounds there would also be the opportunity for each participant to "lobby" on how the tax model should be changed. Each person's lobbying position would align with their own self-interest (those below the median wealth would lobby for more progressive taxation, those above would lobby for less progressive taxation.) And the catch is: the power of their lobbying depends on how much wealth they have.
 
 I think this would show an illuminating model of how modern, "enlightened", democracies under capitalism work against themselves. In a democracy "votes" are power, but in capitalism, "wealth" is power. Can the two systems co-exist over time? Unless voters get an informed, equal, vote on *every* aspect of governance, capitalism steadily drives the intrinsic value of the vote itself toward zero. The model will show that, in the end, voting becomes a circus, the false dichotomy of choosing between near-identical figureheads selected by the oligarchy. Entertainment itself becomes the driving decider in the meaningless race.
 
