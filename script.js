@@ -4,7 +4,7 @@ var betPercent = 7;
 var frameDelay = 2000;
 var moneyPerPlayer = 100;
 var tradeValueFactor = 0.0;
-/* don't put anything before the call to 'onStart()' exception GLOBALS and have no more than 10. */
+/* don't put anything before the call to 'onStart()' exception GLOBALS (and have no more than 10 o those!) */
 /* on start... */
 function onStart() {
     startGame(false);
@@ -49,9 +49,9 @@ var Game = /** @class */ (function () {
     Game.prototype.Tick = function () {
         // Sort them (randomly) into two groups
         this.People.sort(function (a, b) { return (Math.random() - 0.5); });
-        // Have each person in group a trade a random person in group b
+        // Have each person in group A trade with a random person in group B
         var numPairs = Math.round(this.People.length / 2);
-        console.log("We are about to have " + numPairs + " trades....");
+        //console.log(`We are about to have ${numPairs} trades....`);
         for (var index in this.People) {
             if (index >= numPairs) {
                 break;
@@ -121,7 +121,7 @@ var Game = /** @class */ (function () {
             var fractionOfIncome = person.money / wealthTotal;
             cumulativeFractionOfIncome += fractionOfIncome;
             var fractionOfRicherPopulation = 1 - cumulativeFractionOfIncome;
-            // score(B33) = fractionOfIncome(b17) * (fractionOfPopulation(b22)    +  2 * fractionOfRicherPopulation(b27))
+            // score(B33) = fractionOfIncome(b17) * (fractionOfPopulation(b22) + 2 * fractionOfRicherPopulation(b27))
             var score = fractionOfIncome * (fractionOfPopulation + 2 * fractionOfRicherPopulation);
             cumulativeScore += score;
             // cumulativeTotal += person.money;
@@ -192,10 +192,12 @@ function initGameScreen(game) {
 function updateGameSummary(game) {
     var summaryElement = $id("summary");
     if (summaryElement != null) {
-        summaryElement.innerHTML = "<p>\n        <code>Population:</code> " + game.MaxPopulationSize + ", \n        <code>MaxBet%:</code> " + game.MaxBetPercent.toFixed(0) + "%, \n        <code>Rounds:</code> " + game.Rounds + ", \n        <code>PlaySpeed:</code> " + (41000 / (50 + game.FrameDelay)).toFixed(2) + ", \n        " + (game.TradeValueFactor <= 0 ? "" : "<code>TradeValueFactor:</code> " + game.TradeValueFactor.toFixed(1) + ",") + "\n        <code>GiniCoefficient:</code> " + game.GiniCoefficient.toFixed(4) + ", \n        <code>TotalWealth:</code> \uD83D\uDCB2" + formatFloat(game.TotalWealth) + "</p>";
+        summaryElement.innerHTML = "<p>\n        <code>Population:</code> " + game.MaxPopulationSize + ", \n        <code>MaxBet%:</code> " + game.MaxBetPercent.toFixed(0) + "%, \n        <code>Rounds:</code> " + game.Rounds + ", \n        <code>PlaySpeed:</code> " + (41000 / (50 + game.FrameDelay)).toFixed(2) + ", \n        " + (game.TradeValueFactor <= 0 ? "" : "<code>TradeValueFactor:</code> " + game.TradeValueFactor.toFixed(1) + ",") + "\n        <code>GiniCoefficient:</code> " + game.GiniCoefficient.toFixed(4) + ",\n        <code>TotalWealth:</code> \uD83D\uDCB2" + formatFloat(game.TotalWealth) + "</p>";
     }
 }
 function formatFloat(money) {
+    if (money < 0.0000001)
+        return "~0";
     if (money < 0.000001)
         return money.toFixed(8);
     if (money < 0.00001)
@@ -220,7 +222,9 @@ function formatFloat(money) {
         return (money / 1000000).toFixed(2) + "M";
     if (money < 100000000000)
         return (money / 1000000000).toFixed(2) + "B";
-    return money.toString();
+    if (money < 100000000000000)
+        return (money / 1000000000000).toFixed(2) + "T";
+    return "BIG Money";
 }
 function updatePersonPanel(person, maxValue) {
     var personNode = $id(person.id);
@@ -231,8 +235,6 @@ function updatePersonPanel(person, maxValue) {
     }
 }
 function updateGameScreen(game) {
-    //console.log("Game",game);
-    //for (const personId in game.People) {
     var _a, _b;
     var board = $id("board");
     if (board != null) {

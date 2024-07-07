@@ -1,10 +1,10 @@
-let testMode = false;
+﻿let testMode = false;
 let populationSize = 30;
 let betPercent = 7;
 let frameDelay = 2000;
 let moneyPerPlayer = 100;
 let tradeValueFactor = 0.0;
-/* don't put anything before the call to 'onStart()' exception GLOBALS and have no more than 10. */
+/* don't put anything before the call to 'onStart()' exception GLOBALS (and have no more than 10 o those!) */
 /* on start... */
 function onStart() {
    startGame(false);
@@ -57,7 +57,6 @@ class Game {
     MaxBetPercent: number;
     TradeValueFactor: number;
     Rounds: number; //Number of rounds that have been played
-    //People: { [id: string]: Person }; //id's start with "p"
     People: Person[]; //id's start with "p"
     RichestPersonMoney: number;
     GiniCoefficient: number;
@@ -74,9 +73,9 @@ class Game {
     Tick(): void {
         // Sort them (randomly) into two groups
         this.People.sort((a, b) => (Math.random() - 0.5));
-        // Have each person in group a trade a random person in group b
+        // Have each person in group A trade with a random person in group B
         const numPairs: number = Math.round(this.People.length / 2);
-        console.log(`We are about to have ${numPairs} trades....`);
+        //console.log(`We are about to have ${numPairs} trades....`);
         for (const index in this.People) {
             if (<number><unknown>index >= numPairs) {
                 break;
@@ -150,7 +149,7 @@ class Game {
             let fractionOfIncome = person.money / wealthTotal;
             cumulativeFractionOfIncome += fractionOfIncome;
             let fractionOfRicherPopulation = 1 - cumulativeFractionOfIncome;
-            // score(B33) = fractionOfIncome(b17) * (fractionOfPopulation(b22)    +  2 * fractionOfRicherPopulation(b27))
+            // score(B33) = fractionOfIncome(b17) * (fractionOfPopulation(b22) + 2 * fractionOfRicherPopulation(b27))
             let score = fractionOfIncome * (fractionOfPopulation + 2 * fractionOfRicherPopulation)
             cumulativeScore += score;
             // cumulativeTotal += person.money;
@@ -194,10 +193,6 @@ function initLoop() {
     if (TheGame == null) return;
     TheGame.Paused = false;
     onLoop();
-
-    // setInterval(function () {
-    //     onLoop();
-    // }, frameDelay);
 }
 
 function onLoop() {
@@ -246,12 +241,13 @@ function updateGameSummary(game: Game) {
         <code>Rounds:</code> ${game.Rounds}, 
         <code>PlaySpeed:</code> ${(41000 / (50 + game.FrameDelay)).toFixed(2)}, 
         ${(game.TradeValueFactor <= 0 ? "" : `<code>TradeValueFactor:</code> ${game.TradeValueFactor.toFixed(1)},`)}
-        <code>GiniCoefficient:</code> ${game.GiniCoefficient.toFixed(4)}, 
+        <code>GiniCoefficient:</code> ${game.GiniCoefficient.toFixed(4)},
         <code>TotalWealth:</code> 💲${formatFloat(game.TotalWealth)}</p>`;
     }
 }
 
 function formatFloat(money:number):string {
+    if (money < 0.0000001) return "~0";
     if (money < 0.000001) return money.toFixed(8);
     if (money < 0.00001) return money.toFixed(7);
     if (money < 0.0001) return money.toFixed(6);
@@ -261,11 +257,13 @@ function formatFloat(money:number):string {
     if (money < 1) return money.toFixed(2);
     if (money < 10) return money.toFixed(1);
     if (money < 1000) return money.toFixed(0);
-    if (money < 100000) return (money / 1000).toFixed(2) + "K";
-    if (money < 100000000) return (money / 1000000).toFixed(2) + "M";
-    if (money < 100000000000) return (money / 1000000000).toFixed(2) + "B";
-    return money.toString();
+    if (money < 100000) return          (money / 1000).toFixed(2) + "K";
+    if (money < 100000000) return       (money / 1000000).toFixed(2) + "M";
+    if (money < 100000000000) return    (money / 1000000000).toFixed(2) + "B";
+    if (money < 100000000000000) return (money / 1000000000000).toFixed(2) + "T";
+    return "BIG Money";
 }
+
 function updatePersonPanel(person: Person, maxValue: number) {
     const personNode = $id(person.id);
     if (personNode != null) {
@@ -276,16 +274,9 @@ function updatePersonPanel(person: Person, maxValue: number) {
     }
 }
 
-
 function updateGameScreen(game: Game) {
-    //console.log("Game",game);
-    //for (const personId in game.People) {
-
-    
-
     const board = $id("board");
     if (board != null) {
-
         let totalWealth = 0;
         for (const index in game.People) {
             const person = game.People[index];
@@ -5086,8 +5077,8 @@ function pick(personId: string) {
         person.luck += (LuckGivingMode ? 1 : -0.25);
         updatePersonPanel(person, TheGame.RichestPersonMoney);
     }
-
 }
+
 // START
 if (document.readyState !== 'loading') {
     onStart();

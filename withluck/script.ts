@@ -1,4 +1,4 @@
-let testMode = false;
+﻿let testMode = false;
 let populationSize = 30;
 let betPercent = 7;
 let frameDelay = 2000;

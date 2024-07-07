@@ -2,5 +2,4 @@ edit: code .
 watch: tsc script.ts --watch
 serve: browse "http://localhost:1234"; python -m http.server 1234;
 n .\README.md
-coin: tsc coin.ts --watch
-mcd "$arg"; copy ..\index.html; copy ..\style.css; copy ..\script.ts; copy ..\.ok; # make one.
+mcd "$arg"; copy ..\index.html; copy ..\style.css; copy ..\script.ts; copy ..\.ok; # make variant.

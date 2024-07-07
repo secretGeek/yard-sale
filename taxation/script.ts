@@ -1,4 +1,4 @@
-let testMode = false;
+﻿let testMode = false;
 let populationSize = 30;
 let betPercent = 7;
 let frameDelay = 2000;
@@ -5122,8 +5122,8 @@ function pick(personId: string) {
         person.luck += (LuckGivingMode ? 1 : -0.25);
         updatePersonPanel(person, TheGame.RichestPersonMoney);
     }
-
 }
+
 // START
 if (document.readyState !== 'loading') {
     onStart();
