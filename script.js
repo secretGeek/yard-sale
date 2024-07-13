@@ -13,11 +13,10 @@ function startGame(startLoop) {
     initGame(populationSize, betPercent, frameDelay, startLoop, moneyPerPlayer, tradeValueFactor);
 }
 var Person = /** @class */ (function () {
-    function Person(id, name, money, luck) {
+    function Person(id, name, money) {
         this.id = id;
         this.name = name;
         this.money = money;
-        this.luck = luck;
         this.wins = 0;
         this.losses = 0;
     }
@@ -41,7 +40,7 @@ var Game = /** @class */ (function () {
     Game.prototype.init = function (moneyPerPlayer) {
         for (var i = 0; i < this.MaxPopulationSize; i++) {
             var id = this.nextId();
-            var newPerson = new Person("p" + id, getName() + ' ' + getAvatar(), moneyPerPlayer, 1.0);
+            var newPerson = new Person("p" + id, getName() + ' ' + getAvatar(), moneyPerPlayer);
             this.People.push(newPerson);
             //this.People["p"+ newPerson.id] = newPerson;
         }
@@ -67,10 +66,8 @@ var Game = /** @class */ (function () {
     Game.prototype.Trade = function (a, b, maxBetPercent, tradeValueFactor) {
         //console.log(`Trade between ${a.name} (worth ${a.money}) and  ${b.name} (worth ${b.money})`);
         var maxBet = Math.min(a.money, b.money) * (maxBetPercent / 100);
-        // if a.luck > b.luck, then (a/(a+b)) is between (0.5 and 1), thus higher chance rand(0..1) < (number close to 1) - and winner is a.
-        var winner = (Math.random() < (a.luck / (a.luck + b.luck))) ? a : b;
+        var winner = (Math.random() < 0.5) ? a : b;
         //console.log(`The winner is ${winner.name} who wins ${maxBet} (7% of the poorest player's money) !`);
-        // winner is always a (the sorting into groups already picked winners)
         if (winner == a) {
             a.money += maxBet;
             a.wins += 1;
@@ -83,9 +80,6 @@ var Game = /** @class */ (function () {
             b.wins += 1;
             a.money -= maxBet;
             a.losses += 1;
-        }
-        if (a.luck != b.luck) {
-            console.log("Mismatched luck! a has " + a.luck + ", b has " + b.luck + ": winner has " + winner.luck + "!! " + ((winner.luck < a.luck || winner.luck < b.luck) ? "❌❌❌❌" : "🍀🍀🍀🍀"));
         }
         var pieGrowth = maxBet * tradeValueFactor;
         // Do both people benefit in a trade?
@@ -137,7 +131,6 @@ var Game = /** @class */ (function () {
 var TheGame;
 function initGame(populationSize, maxBetPercent, frameDelay, startLoop, moneyPerPlayer, tradeValueFactor) {
     TheGame = new Game(populationSize, maxBetPercent, frameDelay, moneyPerPlayer, tradeValueFactor);
-    //TheGame.People[12].luck = 7;
     initGameScreen(TheGame);
     updateGameScreen(TheGame);
     if (startLoop) {
@@ -154,9 +147,6 @@ function initLoop() {
         return;
     TheGame.Paused = false;
     onLoop();
-    // setInterval(function () {
-    //     onLoop();
-    // }, frameDelay);
 }
 function onLoop() {
     if (TheGame == null || TheGame.Paused)
@@ -231,7 +221,8 @@ function updatePersonPanel(person, maxValue) {
     if (personNode != null) {
         var gamesPlayed = person.wins + person.losses;
         var gamesPlayedNonZero = Math.max(gamesPlayed, 1); // This means if you've played none, you've won Zero %, not Nan%.
-        personNode.innerHTML = "<p data-luck='" + person.luck + "' onclick='pick(\"" + person.id + "\");'>" + person.name + " \uD83D\uDCB2" + formatFloat(person.money) + "<br />(won: " + (100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0) + "% - Luck: " + person.luck + ")</p>\n        <progress id=\"file\" max=\"" + maxValue + "\" value=\"" + person.money + "\" title=\"" + person.money + "\"> " + person.money + " </progress>";
+        personNode.innerHTML =
+            "<p onclick='pick(\"" + person.id + "\");'>" + person.name + " \uD83D\uDCB2" + formatFloat(person.money) + "<br />(won: " + (100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0) + "%)</p>\n        <progress id=\"file\" max=\"" + maxValue + "\" value=\"" + person.money + "\" title=\"" + person.money + "\"> " + person.money + " </progress>";
     }
 }
 function updateGameScreen(game) {
@@ -4984,29 +4975,10 @@ function muchSlower() {
     TheGame.FrameDelay = TheGame.FrameDelay + 150;
     updateGameSummary(TheGame);
 }
-var LuckGivingMode = false;
-function giveLuck() {
-    //classList.add(className);
-    var btnGiveLuck = $id('btnGiveLuck');
-    if (btnGiveLuck == null)
-        return;
-    if (btnGiveLuck.classList.contains("unlit")) {
-        btnGiveLuck.classList.remove("unlit");
-        btnGiveLuck.classList.add("lit");
-        btnGiveLuck.innerText = "🍀 give luck";
-        LuckGivingMode = true;
-    }
-    else {
-        btnGiveLuck.classList.remove("lit");
-        btnGiveLuck.classList.add("unlit");
-        btnGiveLuck.innerText = "🍀 take luck";
-        LuckGivingMode = false;
-    }
-}
 function pick(personId) {
     var person = TheGame === null || TheGame === void 0 ? void 0 : TheGame.People.find(function (p) { return p.id == personId; });
     if (person != null && TheGame != null) {
-        person.luck += (LuckGivingMode ? 1 : -0.25);
+        //do something to person....???
         updatePersonPanel(person, TheGame.RichestPersonMoney);
     }
 }

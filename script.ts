@@ -15,11 +15,10 @@ function startGame(startLoop: boolean) {
 }
 
 class Person {
-    constructor(id: string, name: string, money: number, luck: number) {
+    constructor(id: string, name: string, money: number) {
         this.id = id;
         this.name = name;
         this.money = money;
-        this.luck = luck;
         this.wins = 0;
         this.losses = 0;
     }
@@ -31,7 +30,6 @@ class Person {
     money: number;
     wins: number;
     losses: number;
-    luck: number;
 }
 
 class Game {
@@ -65,7 +63,7 @@ class Game {
     init(moneyPerPlayer: number): void {
         for (let i: number = 0; i < this.MaxPopulationSize; i++) {
             let id = this.nextId();
-            let newPerson = new Person("p" + <string><unknown>id, getName() + ' ' + getAvatar(), moneyPerPlayer, 1.0);
+            let newPerson = new Person("p" + <string><unknown>id, getName() + ' ' + getAvatar(), moneyPerPlayer);
             this.People.push(newPerson);
             //this.People["p"+ newPerson.id] = newPerson;
         }
@@ -91,10 +89,8 @@ class Game {
     Trade(a: Person, b: Person, maxBetPercent: number, tradeValueFactor: number): Person {
         //console.log(`Trade between ${a.name} (worth ${a.money}) and  ${b.name} (worth ${b.money})`);
         const maxBet = Math.min(a.money, b.money) * (maxBetPercent / 100);
-        // if a.luck > b.luck, then (a/(a+b)) is between (0.5 and 1), thus higher chance rand(0..1) < (number close to 1) - and winner is a.
-        let winner = (Math.random() < (a.luck / (a.luck + b.luck))) ? a : b;
+        let winner = (Math.random() < 0.5) ? a : b;
         //console.log(`The winner is ${winner.name} who wins ${maxBet} (7% of the poorest player's money) !`);
-        // winner is always a (the sorting into groups already picked winners)
 
         if (winner == a) {
             a.money += maxBet;
@@ -107,9 +103,6 @@ class Game {
             b.wins += 1;
             a.money -= maxBet;
             a.losses += 1;
-        }
-        if (a.luck != b.luck) {
-            console.log(`Mismatched luck! a has ${a.luck}, b has ${b.luck}: winner has ${winner.luck}!! ${(winner.luck < a.luck || winner.luck < b.luck)? "❌❌❌❌" : "🍀🍀🍀🍀"}`);
         }
         const pieGrowth = maxBet * tradeValueFactor;
 
@@ -175,7 +168,6 @@ let TheGame: Game | undefined;
 
 function initGame(populationSize: number, maxBetPercent: number, frameDelay: number, startLoop: boolean, moneyPerPlayer: number, tradeValueFactor:number) {
     TheGame = new Game(populationSize, maxBetPercent, frameDelay, moneyPerPlayer, tradeValueFactor);
-    //TheGame.People[12].luck = 7;
     initGameScreen(TheGame);
     updateGameScreen(TheGame);
     if (startLoop) {
@@ -269,7 +261,8 @@ function updatePersonPanel(person: Person, maxValue: number) {
     if (personNode != null) {
         const gamesPlayed = person.wins + person.losses;
         const gamesPlayedNonZero = Math.max(gamesPlayed, 1); // This means if you've played none, you've won Zero %, not Nan%.
-        personNode.innerHTML = `<p data-luck='${person.luck}' onclick='pick("${person.id}");'>${person.name} 💲${formatFloat(person.money)}<br />(won: ${(100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0)}% - Luck: ${person.luck})</p>
+        personNode.innerHTML =
+        `<p onclick='pick("${person.id}");'>${person.name} 💲${formatFloat(person.money)}<br />(won: ${(100 * (person.wins) / (gamesPlayedNonZero)).toFixed(0)}%)</p>
         <progress id="file" max="${maxValue}" value="${person.money}" title="${person.money}"> ${person.money} </progress>`;
     }
 }
@@ -5054,27 +5047,10 @@ function muchSlower() {
     updateGameSummary(TheGame);
 }
 
-let LuckGivingMode = false;
-function giveLuck() {
-    //classList.add(className);
-    let btnGiveLuck = $id('btnGiveLuck');
-    if (btnGiveLuck == null) return;
-    if (btnGiveLuck.classList.contains("unlit")) {
-        btnGiveLuck.classList.remove("unlit");
-        btnGiveLuck.classList.add("lit");
-        btnGiveLuck.innerText = "🍀 give luck";
-        LuckGivingMode = true;
-    } else {
-        btnGiveLuck.classList.remove("lit");
-        btnGiveLuck.classList.add("unlit");
-        btnGiveLuck.innerText = "🍀 take luck";
-        LuckGivingMode = false;
-    }
-}
 function pick(personId: string) {
     let person = TheGame?.People.find(p => p.id == personId);
     if (person != null && TheGame != null) {
-        person.luck += (LuckGivingMode ? 1 : -0.25);
+        //do something to person....???
         updatePersonPanel(person, TheGame.RichestPersonMoney);
     }
 }
